@@ -1,12 +1,21 @@
 -- liquibase formatted sql
 -- changeset andrey-rock:1
 
+CREATE TABLE users
+(
+    id       BIGSERIAL PRIMARY KEY,
+    username VARCHAR(64)  NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL UNIQUE,
+    role     VARCHAR(16)
+);
+
 CREATE TABLE cards
 (
-    wallet_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Card_number VARCHAR(19) not null,
-    owner VARCHAR(32) not null,
-    expiration_date DATE not null ,
-    status VARCHAR(10) not null ,
-    balance BIGINT check (balance > 0)
+    card_id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_number     VARCHAR(19) NOT NULL UNIQUE,
+    owner_id        BIGINT      NOT NULL,
+    expiration_date TIMESTAMP   NOT NULL,
+    status          VARCHAR(16) NOT NULL,
+    balance         NUMERIC check (balance >= 0),
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

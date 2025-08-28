@@ -13,5 +13,13 @@ spring:
     username: postgres
     password: postgres
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
   liquibase:
     change-log: db/migration/changelog-master.yml
+
+logging:
+  charset:
+    console: UTF-8
