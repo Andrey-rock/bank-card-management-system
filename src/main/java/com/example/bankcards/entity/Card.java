@@ -1,12 +1,13 @@
 package com.example.bankcards.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -22,10 +23,10 @@ public class Card {
     private UUID cardId;
 
     @Column(name = "card_number")
-    private String card_number;
+    private String cardNumber;
 
     @Column(name = "expiration_date")
-    private Date expiryDate;
+    private LocalDate expiryDate;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -36,5 +37,6 @@ public class Card {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
+    @JsonBackReference
     private User owner;
 }
