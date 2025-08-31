@@ -9,12 +9,14 @@ import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -32,6 +34,8 @@ public class CardService {
         this.userRepository = userRepository;
     }
 
+
+
     public CardDto create(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(UserNoSuchException::new);
@@ -41,9 +45,10 @@ public class CardService {
         card.setStatus(Status.ACTIVE);
         card.setExpiryDate(LocalDate.now(Clock.systemDefaultZone()).plusYears(5));
         card.setBalance(BigDecimal.ZERO);
-        user.getCards().add(card);
 
-        return cardMapper.toCardDto(cardRepository.save(card));
+
+        Card savedCard = cardRepository.save(card);
+        return cardMapper.toCardDto(savedCard);
     }
 
     public Collection<CardDto> findAll() {
@@ -68,10 +73,8 @@ public class CardService {
         return cardRepository.save(card);
     }
 
-    private String getNewNumber() {
-        String number = "0000 0000 0000 0000";
-        StringBuilder newNumber = new StringBuilder(number);
-        newNumber.setCharAt(0, ++counter);
-        return newNumber.toString();
+    private long getNewNumber() {
+        Random random = new Random();
+        return random.nextLong(1000000000000000L, 9999999999999999L);
     }
 }

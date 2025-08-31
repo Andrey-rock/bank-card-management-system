@@ -12,7 +12,7 @@ CREATE TABLE users
 CREATE TABLE cards
 (
     card_id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    card_number     VARCHAR(19) NOT NULL UNIQUE,
+    card_number     BIGINT      NOT NULL UNIQUE ,
     owner_id        BIGINT      NOT NULL,
     expiration_date DATE        NOT NULL,
     status          VARCHAR(16) NOT NULL,
