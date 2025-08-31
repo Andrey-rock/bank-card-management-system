@@ -14,8 +14,10 @@ spring:
     password: postgres
 
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: validate
+
 
   liquibase:
     change-log: db/migration/changelog-master.yml

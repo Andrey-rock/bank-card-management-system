@@ -18,5 +18,5 @@ public class CardDto {
     private LocalDate expiryDate;
     private Status status;
     private BigDecimal balance;
-    private User owner;
+    private String ownerName;
 }

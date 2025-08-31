@@ -23,13 +23,13 @@ public class CardController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Card> getAllCards() {
+    public Collection<CardDto> getAllCards() {
         return cardService.findAll();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Card> getCardById(@PathVariable String id) {
-        Card card = cardService.findById(UUID.fromString(id));
+    public ResponseEntity<CardDto> getCardById(@PathVariable String id) {
+        CardDto card = cardService.findById(UUID.fromString(id));
         if (card == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -38,12 +38,12 @@ public class CardController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteCard(@PathVariable String id) {
-        Card card = cardService.findById(UUID.fromString(id));
+        CardDto card = cardService.findById(UUID.fromString(id));
         if (card == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         cardService.delete(UUID.fromString(id));
-        return new ResponseEntity<>("Карта удалена", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping

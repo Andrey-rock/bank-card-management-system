@@ -10,7 +10,7 @@ public class CardMapper {
     public CardDto toCardDto(Card card) {
         CardDto cardDto = new CardDto();
         cardDto.setCardNumber(mask(card.getCardNumber()));
-        cardDto.setOwner(card.getOwner());
+        cardDto.setOwnerName(card.getOwner().getUsername());
         cardDto.setStatus(card.getStatus());
         cardDto.setBalance(card.getBalance());
         cardDto.setExpiryDate(card.getExpiryDate());
