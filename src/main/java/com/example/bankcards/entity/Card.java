@@ -36,8 +36,11 @@ public class Card {
     @Column(name = "balance")
     private BigDecimal balance;
 
+    @Column(name = "request_block")
+    private boolean requestBlock;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
-    @JsonBackReference
+    @JsonIgnore
     private User owner;
 }

@@ -1,6 +1,7 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.CardDto;
+import com.example.bankcards.dto.CardUpdateDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Status;
 import com.example.bankcards.entity.User;
@@ -9,7 +10,7 @@ import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardMapper;
-import jakarta.transaction.Transactional;
+import com.example.bankcards.util.Utils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,18 +23,17 @@ import java.util.UUID;
 @Service
 public class CardService {
 
-    private char counter = '0';
-
     private final CardRepository cardRepository;
     private final CardMapper cardMapper;
     private final UserRepository userRepository;
+    private final Utils utils;
 
-    public CardService(CardRepository cardRepository, CardMapper cardMapper, UserRepository userRepository) {
+    public CardService(CardRepository cardRepository, CardMapper cardMapper, UserRepository userRepository, Utils utils) {
         this.cardRepository = cardRepository;
         this.cardMapper = cardMapper;
         this.userRepository = userRepository;
+        this.utils = utils;
     }
-
 
 
     public CardDto create(Long userId) {
@@ -59,18 +59,33 @@ public class CardService {
         return cardMapper.toCardDto(cardRepository.findById(id).orElseThrow(CardNoSuchException::new));
     }
 
+    public CardDto findByCardNumber(String cardNumber) {
+        return cardMapper.toCardDto(cardRepository.findByCardNumber(utils.transformNumber(cardNumber)).orElseThrow(CardNoSuchException::new));
+    }
+
     public void delete(UUID id) {
+        if (!cardRepository.existsById(id)) {
+            throw new CardNoSuchException();
+        }
         cardRepository.deleteById(id);
     }
 
-    public void setStatus(UUID id, String status) {
-        Card card = cardRepository.findById(id).orElseThrow(CardNoSuchException::new);
-        card.setStatus(Status.valueOf(status));
-        cardRepository.save(card);
+    public void deleteByCardNumber(String cardNumber) {
+        long number = utils.transformNumber(cardNumber);
+        if (!cardRepository.existsByCardNumber(number)) {
+            throw new CardNoSuchException();
+        }
+        cardRepository.deleteByCardNumber(number);
     }
 
-    public Card update(Card card) {
-        return cardRepository.save(card);
+    public CardDto setStatus(String number, String status) {
+        Card card = cardRepository.findByCardNumber(utils.transformNumber(number)).orElseThrow(CardNoSuchException::new);
+        card.setStatus(Status.valueOf(status));
+        return cardMapper.toCardDto(cardRepository.save(card));
+    }
+
+    public CardDto update(CardUpdateDto card) {
+        return cardMapper.toCardDto(cardRepository.save(cardMapper.toEntity(card)));
     }
 
     private long getNewNumber() {
