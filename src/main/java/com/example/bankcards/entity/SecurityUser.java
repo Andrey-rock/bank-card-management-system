@@ -15,7 +15,7 @@ public record SecurityUser(User user) implements UserDetails {
     @Contract(" -> new")
     @Override
     public @NotNull @Unmodifiable Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of( );
+        return List.of( new SimpleGrantedAuthority("ROLE_" + user.getRole().toString()));
     }
 
     @Override
