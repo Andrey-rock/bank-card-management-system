@@ -1,34 +1,27 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.Register;
-import com.example.bankcards.entity.SecurityUser;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.UserAlreadyExistException;
 import com.example.bankcards.exception.UserDoesNotExistException;
 import com.example.bankcards.exception.WrongPasswordException;
 import com.example.bankcards.security.MyUserDetailsService;
 import com.example.bankcards.util.UserMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final PasswordEncoder encoder;
     private final MyUserDetailsService manager;
     private final UserMapper userMapper;
-
-    public AuthService(PasswordEncoder passwordEncoder, MyUserDetailsService userDetailsManager, UserMapper userMapper) {
-
-        this.encoder = passwordEncoder;
-        this.manager = userDetailsManager;
-        this.userMapper = userMapper;
-    }
 
     /**
      * Метод для авторизации пользователя

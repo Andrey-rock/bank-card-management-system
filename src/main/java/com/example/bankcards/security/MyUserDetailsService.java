@@ -1,6 +1,7 @@
 package com.example.bankcards.security;
 
 import com.example.bankcards.entity.SecurityUser;
+import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
@@ -33,7 +34,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         log.debug("Method for loading user's by username start");
 
-        SecurityUser securityUser = new SecurityUser(userRepository.findByUsername(username));
+        SecurityUser securityUser = new SecurityUser(userRepository.findByUsername(username).orElseThrow(UserNoSuchException::new));
         return new User(securityUser.getUsername(), securityUser.getPassword(),
                 securityUser.getAuthorities());
     }
@@ -73,7 +74,7 @@ public class MyUserDetailsService implements UserDetailsService {
 //    public boolean changePassword(String username, @NotNull NewPassword newPassword) {
 //
 //        log.debug("Method for change password start");
-//        User user = userRepository.findByUsername(username);
+//        User user = userRepository.findByOwnerId(username);
 //        String currentPass = newPassword.getCurrentPassword();
 //        String newPass = newPassword.getNewPassword();
 //        if (encoder.matches(currentPass, userEntity.getPassword())) {

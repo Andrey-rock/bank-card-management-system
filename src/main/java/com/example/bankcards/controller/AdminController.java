@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("admin")
 public class AdminController {
 
     private final CardService cardService;
