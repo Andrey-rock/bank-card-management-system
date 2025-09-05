@@ -26,6 +26,7 @@ public class CardMapper {
         cardDto.setStatus(card.getStatus());
         cardDto.setBalance(card.getBalance());
         cardDto.setExpiryDate(card.getExpiryDate());
+        cardDto.setId(card.getCardId());
         return cardDto;
     }
 

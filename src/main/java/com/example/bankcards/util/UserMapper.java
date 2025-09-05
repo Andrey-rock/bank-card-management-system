@@ -1,10 +1,10 @@
 package com.example.bankcards.util;
 
 import com.example.bankcards.dto.Register;
+import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.data.jpa.repository.Modifying;
 
 /**
  * Mapper для пользователей.
@@ -17,5 +17,7 @@ public interface UserMapper {
 
     @Mapping(target = "enabled", constant = "true")
     User entityFromRegister(Register register);
+
+    UserDto entityToDto(User user);
 }
 

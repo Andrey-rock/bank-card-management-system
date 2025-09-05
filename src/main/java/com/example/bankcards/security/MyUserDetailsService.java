@@ -49,7 +49,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         log.debug("Method for checking existing user start");
 
-        return userRepository.findByUsername(userName) != null;
+        return userRepository.findByUsername(userName).isPresent();
     }
 
     /**

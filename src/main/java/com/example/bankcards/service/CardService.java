@@ -65,6 +65,15 @@ public class CardService {
         return cardRepository.findByOwnerId(ownerId, pageRequest).getContent().stream().map(cardMapper::toCardDto).toList();
     }
 
+    public Collection<CardDto> findByOwnerIdAndCardNumber(long ownerId,
+                                                          String cardNumber,
+                                                          int page,
+                                                          int size) {
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        return cardRepository.findByOwnerIdAndCardNumber(ownerId, utils.transformNumber(cardNumber), pageRequest).getContent()
+                .stream().map(cardMapper::toCardDto).toList();
+    }
+
     public void delete(UUID id) {
         if (!cardRepository.existsById(id)) {
             throw new CardNoSuchException();
@@ -80,8 +89,8 @@ public class CardService {
         cardRepository.deleteByCardNumber(number);
     }
 
-    public CardDto setStatus(String number, String status) {
-        Card card = cardRepository.findByCardNumber(utils.transformNumber(number)).orElseThrow(CardNoSuchException::new);
+    public CardDto setStatus(String id, String status) {
+        Card card = cardRepository.findById(UUID.fromString(id)).orElseThrow(CardNoSuchException::new);
         card.setStatus(Status.valueOf(status));
         return cardMapper.toCardDto(cardRepository.save(card));
     }
@@ -90,8 +99,8 @@ public class CardService {
         return cardMapper.toCardDto(cardRepository.save(cardMapper.toEntity(card)));
     }
 
-    public BigDecimal getBalance(String cardNumber) {
-        Card card = cardRepository.findByCardNumber(utils.transformNumber(cardNumber)).orElseThrow(CardNoSuchException::new);
+    public BigDecimal getBalance(UUID id) {
+        Card card = cardRepository.findById(id).orElseThrow(CardNoSuchException::new);
         return card.getBalance();
     }
 

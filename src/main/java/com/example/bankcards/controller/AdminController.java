@@ -2,7 +2,11 @@ package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.CardDto;
 import com.example.bankcards.dto.CardUpdateDto;
+import com.example.bankcards.dto.UserDto;
+import com.example.bankcards.entity.User;
 import com.example.bankcards.service.CardService;
+import com.example.bankcards.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,15 +15,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("admin")
+@RequiredArgsConstructor
 public class AdminController {
 
     private final CardService cardService;
+    private final UserService userService;
 
-    public AdminController(CardService cardService) {
-        this.cardService = cardService;
-    }
-
-    @GetMapping("/cards")
+    @GetMapping("cards")
     @ResponseStatus(HttpStatus.OK)
     public Collection<CardDto> getAllCards() {
         return cardService.findAll();
@@ -33,7 +35,7 @@ public class AdminController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
-    public CardDto getCardByNumber(@RequestParam(name = "number") String number) {
+    public CardDto findCardByNumber(@RequestParam(name = "number") String number) {
         return cardService.findByCardNumber(number);
     }
 
@@ -43,12 +45,6 @@ public class AdminController {
         cardService.delete(UUID.fromString(id));
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("")
-    public void deleteCardByNumber(@RequestParam String number) {
-        cardService.deleteByCardNumber(number);
-    }
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public CardDto createCard(Long userId) {
@@ -56,13 +52,43 @@ public class AdminController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping({"{number}"})
-    public CardDto setStatus(@PathVariable String number, @RequestParam(name = "status") String status) {
-        return cardService.setStatus(number, status);
+    @PatchMapping({"{id}"})
+    public CardDto setStatus(@PathVariable String id, @RequestParam(name = "status") String status) {
+        return cardService.setStatus(id, status);
     }
 
     @PutMapping
     public CardDto updateCard(CardUpdateDto card) {
         return cardService.update(card);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("user/block/{id}")
+    public void blockedUser(@PathVariable long id) {
+        userService.blockedUser(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("user")
+    public User updateUser(User user) {
+        return userService.updateUser(user);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("user/{id}")
+    public void deleteUser(@PathVariable long id) {
+        userService.deleteUser(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("users")
+    public Collection<UserDto> getUsers() {
+       return userService.getAllUsers();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("user")
+    public UserDto getUser(@RequestParam(name = "id") long id) {
+        return userService.getUserById(id);
     }
 }
