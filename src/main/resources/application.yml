@@ -18,11 +18,12 @@ spring:
     hibernate:
       ddl-auto: validate
 
-
   liquibase:
     change-log: db/migration/changelog-master.yml
 
-
+encryption:
+  secret:
+    key: your-super-secret-key-32-chars-long
 
 logging:
   charset:

@@ -1,6 +1,6 @@
 package com.example.bankcards.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.bankcards.util.CardNumberEncryptor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,8 +23,9 @@ public class Card {
     @Column(name = "card_id")
     private UUID cardId;
 
+    @Convert(converter = CardNumberEncryptor.class)
     @Column(name = "card_number")
-    private Long cardNumber;
+    private String cardNumber;
 
     @Column(name = "expiration_date")
     private LocalDate expiryDate;

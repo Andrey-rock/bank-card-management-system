@@ -20,7 +20,7 @@ public class CardMapper {
 
     public CardDto toCardDto(@NotNull Card card) {
         CardDto cardDto = new CardDto();
-        String cardNumber = Long.toString(card.getCardNumber());
+        String cardNumber = card.getCardNumber();
         cardDto.setCardNumber(utils.mask(cardNumber));
         cardDto.setOwnerName(card.getOwner().getUsername());
         cardDto.setStatus(card.getStatus());

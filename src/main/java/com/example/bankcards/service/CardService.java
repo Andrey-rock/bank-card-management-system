@@ -13,6 +13,7 @@ import com.example.bankcards.util.CardMapper;
 import com.example.bankcards.util.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -34,13 +35,14 @@ public class CardService {
 
 
     public CardDto create(Long userId) {
+        int VALIDITY_PERIOD = 5;
 
         User user = userRepository.findById(userId).orElseThrow(UserNoSuchException::new);
         Card card = new Card();
         card.setCardNumber(getNewNumber());
         card.setOwner(user);
         card.setStatus(Status.ACTIVE);
-        card.setExpiryDate(LocalDate.now(Clock.systemDefaultZone()).plusYears(5));
+        card.setExpiryDate(LocalDate.now(Clock.systemDefaultZone()).plusYears(VALIDITY_PERIOD));
         card.setBalance(BigDecimal.ZERO);
 
 
@@ -81,14 +83,6 @@ public class CardService {
         cardRepository.deleteById(id);
     }
 
-    public void deleteByCardNumber(String cardNumber) {
-        long number = utils.transformNumber(cardNumber);
-        if (!cardRepository.existsByCardNumber(number)) {
-            throw new CardNoSuchException();
-        }
-        cardRepository.deleteByCardNumber(number);
-    }
-
     public CardDto setStatus(String id, String status) {
         Card card = cardRepository.findById(UUID.fromString(id)).orElseThrow(CardNoSuchException::new);
         card.setStatus(Status.valueOf(status));
@@ -114,8 +108,8 @@ public class CardService {
         cardRepository.save(card2);
     }
 
-    private long getNewNumber() {
+    private @NotNull String getNewNumber() {
         Random random = new Random();
-        return random.nextLong(1000000000000000L, 9999999999999999L);
+        return Long.toString(random.nextLong(1000000000000000L, 9999999999999999L));
     }
 }
