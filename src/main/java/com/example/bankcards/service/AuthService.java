@@ -7,6 +7,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.UserAlreadyExistException;
 import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.exception.WrongPasswordException;
+import com.example.bankcards.security.JwtService;
 import com.example.bankcards.security.MyUserDetailsService;
 import com.example.bankcards.util.UserMapper;
 import lombok.RequiredArgsConstructor;
