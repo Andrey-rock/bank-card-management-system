@@ -24,11 +24,11 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(UserNoSuchException::new);
     }
 
-    public User updateUser(@NotNull User user) {
+    public UserDto updateUser(@NotNull UserDto user) {
         if (!userRepository.existsById(user.getId())) {
             throw new UserNoSuchException();
         }
-        return userRepository.save(user);
+        return userMapper.entityToDto(userRepository.save(userMapper.fromDto(user)));
     }
 
     public void deleteUser(long id) {

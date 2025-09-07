@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO c токеном доступа.
+ *
+ * @author Andrei Bronskijj
+ * @version 0.0.1
+ */
 @Data
 @Builder
 @NoArgsConstructor

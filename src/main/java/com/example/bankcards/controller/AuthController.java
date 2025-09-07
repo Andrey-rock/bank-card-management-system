@@ -9,18 +9,26 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Контроллер для регистрации и аутентификации
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+
     /**
      * Авторизация пользователя
      */
@@ -28,13 +36,12 @@ public class AuthController {
     @Tag(name = "Авторизация")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
     })
     @PostMapping("/login")
-    public JwtAuthenticationResponse login(@RequestBody Login login) {
+    public JwtAuthenticationResponse login(@Valid @RequestBody Login login) {
 
         log.info("Controller method's for logging user");
-
         return authService.login(login.getUsername(), login.getPassword());
     }
 
@@ -48,7 +55,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content())
     })
     @PostMapping("/register")
-    public JwtAuthenticationResponse register(@RequestBody Register register) {
+    public JwtAuthenticationResponse register(@Valid @RequestBody Register register) {
 
         log.info("Controller method's for registration new user");
         return authService.register(register);

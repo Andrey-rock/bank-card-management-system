@@ -19,5 +19,7 @@ public interface UserMapper {
     User entityFromRegister(Register register);
 
     UserDto entityToDto(User user);
+
+    User fromDto(UserDto userDto);
 }
 
