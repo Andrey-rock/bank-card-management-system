@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,15 +31,13 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * Авторизация пользователя
-     */
-    @Operation(summary = "Авторизация пользователя")
-    @Tag(name = "Авторизация")
+    @Operation(summary = "Аутентификация пользователя")
+    @Tag(name = "Аутентификация")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
     })
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/login")
     public JwtAuthenticationResponse login(@Valid @RequestBody Login login) {
 
@@ -45,15 +45,13 @@ public class AuthController {
         return authService.login(login.getUsername(), login.getPassword());
     }
 
-    /**
-     * Регистрация пользователя
-     */
     @Operation(summary = "Регистрация пользователя")
     @Tag(name = "Регистрация")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content())
     })
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/register")
     public JwtAuthenticationResponse register(@Valid @RequestBody Register register) {
 

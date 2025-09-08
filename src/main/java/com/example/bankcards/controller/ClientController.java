@@ -70,7 +70,7 @@ public class ClientController {
     @Transactional
     @PostMapping("transfer")
     public void transferMany(String cardNumber1, String cardNumber2, double amount) {
-        cardService.transferMoney(cardNumber1, cardNumber2, BigDecimal.valueOf(amount));
+        cardService.transferMoney(cardNumber1, cardNumber2, amount);
     }
 
 

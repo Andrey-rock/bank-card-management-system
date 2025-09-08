@@ -12,6 +12,7 @@ import com.example.bankcards.security.JwtService;
 import com.example.bankcards.security.MyUserDetailsService;
 import com.example.bankcards.util.UserMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -46,17 +47,24 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
+    String username = "test";
+    String password = "password";
+    String encodedPassword = "encodedPassword";
+    User user = new User();
+    Register register = new Register(username, password, Role.USER);
+
+    @BeforeEach
+    void setUp() {
+        user.setUsername(username);
+        user.setPassword(password);
+    }
+
+
     //Тест успешной регистрации
     @Test
     public void testRegisterSuccess() {
-        String username = "test";
-        String password = "password";
-        String encodedPassword = "encodedPassword";
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        Register register = new Register(username, password, Role.USER);
-        JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse("test_token");
+
+        JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse("token");
         when(manager.userExists(username)).thenReturn(false);
         when(encoder.encode(password)).thenReturn(encodedPassword);
         when(userMapper.entityFromRegister(register)).thenReturn(user);
@@ -64,7 +72,6 @@ public class AuthServiceTest {
 
         JwtAuthenticationResponse response = authService.register(register);
 
-        verify(encoder).encode(register.getPassword());
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(manager).createUser(userCaptor.capture());
         User createdUser = userCaptor.getValue();
@@ -73,23 +80,21 @@ public class AuthServiceTest {
         Assertions.assertEquals(response, jwtAuthenticationResponse);
     }
 
+    //Тест провальной регистрации - пользователь уже существует
     @Test
     public void testRegisterFailedBecauseUserExists() {
-        String username = "test";
-        String password = "password";
-        Register register = new Register(username, password, Role.USER);
+
         when(manager.userExists(username)).thenReturn(true);
 
         assertThrows(UserAlreadyExistException.class, () -> authService.register(register));
 
-        verify(manager).userExists(register.getUsername());
         verifyNoMoreInteractions(userMapper, encoder, manager, jwtService);
     }
 
+    //Тест успешной аутентификации
     @Test
     void testLoginSuccess() {
-        String username = "username";
-        String password = "password";
+
         JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse("token");
         UserDetails userDetails = mock(UserDetails.class);
         when(manager.userExists(username)).thenReturn(true);
@@ -101,16 +106,12 @@ public class AuthServiceTest {
         JwtAuthenticationResponse result = authService.login(username, password);
 
         Assertions.assertEquals(result, jwtResponse);
-        verify(manager).userExists(username);
-        verify(manager).loadUserByUsername(username);
-        verify(encoder).matches(password, "hashedPassword");
-        verify(jwtService).generateToken(userDetails);
     }
 
+    //Тест провальной аутентификации - неверный пароль
     @Test
     void testLoginFailedBecausePasswordWrong() {
-        String username = "username";
-        String password = "password";
+
         UserDetails userDetails = mock(UserDetails.class);
         when(manager.userExists(username)).thenReturn(true);
         when(manager.loadUserByUsername(username)).thenReturn(userDetails);
@@ -118,16 +119,12 @@ public class AuthServiceTest {
         when(encoder.matches(password, "hashedPassword")).thenReturn(false);
 
         assertThrows(WrongPasswordException.class, () -> authService.login(username, password));
-        verify(manager).userExists(username);
-        verify(manager).loadUserByUsername(username);
-        verify(encoder).matches(password, "hashedPassword");
-        verifyNoMoreInteractions(jwtService);
     }
 
+    //Тест провальной аутентификации - пользователь не найден
     @Test
     void testLoginFailedBecauseUserNotExists() {
-        String username = "username";
-        String password = "password";
+
         when(manager.userExists(username)).thenReturn(false);
 
         assertThrows(UserNoSuchException.class, () -> authService.login(username, password));

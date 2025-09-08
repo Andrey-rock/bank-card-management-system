@@ -6,6 +6,7 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Status;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.CardNoSuchException;
+import com.example.bankcards.exception.MyIllegalArgumentException;
 import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
@@ -44,7 +45,6 @@ public class CardService {
         card.setStatus(Status.ACTIVE);
         card.setExpiryDate(LocalDate.now(Clock.systemDefaultZone()).plusYears(VALIDITY_PERIOD));
         card.setBalance(BigDecimal.ZERO);
-
 
         Card savedCard = cardRepository.save(card);
         return cardMapper.toCardDto(savedCard);
@@ -99,11 +99,20 @@ public class CardService {
     }
 
     @Transactional
-    public void transferMoney(String cardNumber1, String cardNumber2, BigDecimal amount) {
+    public void transferMoney(String cardNumber1, String cardNumber2, double amount) {
+        if (amount <= 0) {
+            throw new MyIllegalArgumentException("Введите сумму больше нуля");
+        }
+
         Card card1 = cardRepository.findByCardNumber(utils.transformNumber(cardNumber1)).orElseThrow(CardNoSuchException::new);
         Card card2 = cardRepository.findByCardNumber(utils.transformNumber(cardNumber2)).orElseThrow(CardNoSuchException::new);
-        card1.setBalance(card1.getBalance().subtract(amount));
-        card2.setBalance(card2.getBalance().add(amount));
+
+        if (card1.getBalance().doubleValue() < amount) {
+            throw new MyIllegalArgumentException("Недостаточно средств для перевода");
+        }
+
+        card1.setBalance(card1.getBalance().subtract(BigDecimal.valueOf(amount)));
+        card2.setBalance(card2.getBalance().add(BigDecimal.valueOf(amount)));
         cardRepository.save(card1);
         cardRepository.save(card2);
     }
