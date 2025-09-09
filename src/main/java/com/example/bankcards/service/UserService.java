@@ -5,12 +5,14 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.UserMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -24,11 +26,15 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(UserNoSuchException::new);
     }
 
+    @Transactional
     public UserDto updateUser(@NotNull UserDto user) {
         if (!userRepository.existsById(user.getId())) {
             throw new UserNoSuchException();
         }
-        return userMapper.entityToDto(userRepository.save(userMapper.fromDto(user)));
+        User user1 = userRepository.getReferenceById(user.getId());
+        user1.setUsername(user.getUsername());
+        user1.setRole(user.getRole());
+        return userMapper.entityToDto(userRepository.save(user1));
     }
 
     public void deleteUser(long id) {
@@ -46,11 +52,13 @@ public class UserService {
     public void blockedUser(long id) {
         User user = userRepository.findById(id).orElseThrow(UserNoSuchException::new);
         user.setEnabled(false);
+        userRepository.save(user);
     }
 
     public String blockingRequest(String id, String name) {
+        UUID uuid = UUID.fromString(id);
         //В коммерческом приложении сообщение должно уйти администраторам. Здесь просто печатается в консоль
         log.info("Blocking request for card id {} by user with name {}", id, name);
-        return String.format("Запрос на блокировку карты id= %s от пользователя %s принят", id, name);
+        return String.format("Запрос на блокировку карты id= %s от пользователя %s принят", uuid, name);
     }
 }

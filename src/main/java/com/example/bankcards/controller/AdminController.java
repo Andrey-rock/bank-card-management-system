@@ -56,18 +56,6 @@ public class AdminController {
         return cardService.findById(UUID.fromString(id));
     }
 
-    @Operation(summary = "Поиск карты по номеру")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Not found", content = @Content())
-    })
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("")
-    public CardDto findCardByNumber(@RequestParam(name = "number") String number) {
-        return cardService.findByCardNumber(number);
-    }
-
     @Operation(summary = "Удаление карты")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No content"),
@@ -86,8 +74,8 @@ public class AdminController {
             @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content())
     })
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    public CardDto createCard(long userId) {
+    @PostMapping("{userId}")
+    public CardDto createCard(@PathVariable long userId) {
         return cardService.create(userId);
     }
 
@@ -120,7 +108,7 @@ public class AdminController {
             @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content())
     })
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("user/block/{id}")
+    @PatchMapping("user/block/{id}")
     public void blockedUser(@PathVariable long id) {
         userService.blockedUser(id);
     }
@@ -167,8 +155,8 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content())
     })
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("user")
-    public UserDto getUser(@RequestParam(name = "id") long id) {
+    @GetMapping("user/{id}")
+    public UserDto getUser(@PathVariable long id) {
         return userService.getUserById(id);
     }
 }
