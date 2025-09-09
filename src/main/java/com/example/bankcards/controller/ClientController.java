@@ -45,17 +45,13 @@ public class ClientController {
     @GetMapping()
     public ResponseEntity<?> getAllCardsByName(Authentication authentication,
                                                  @RequestParam(defaultValue = "1") int page,
-                                                 @RequestParam(defaultValue = "3") int size,
-                                                 @RequestParam(required = false) String cardNumber) {
+                                                 @RequestParam(defaultValue = "3") int size) {
         Collection<CardDto> response;
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         long userId = userService.getUserByUsername(authentication.getName()).getId();
-        if (cardNumber != null) {
-            response = cardService.findByOwnerIdAndCardNumber(userId, cardNumber, page, size);
-            return ResponseEntity.ok(response);
-        }
+
         response = cardService.findByOwnerId(userId, page, size);
         return ResponseEntity.ok(response);
     }
@@ -69,8 +65,11 @@ public class ClientController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @PostMapping("transfer")
-    public void transferMany(String cardNumber1, String cardNumber2, double amount) {
-        cardService.transferMoney(cardNumber1, cardNumber2, amount);
+  
+    public void transferMany(@RequestParam(name = "cardId1") String cardId1,
+                             @RequestParam(name = "cardId2") String cardId2,
+                             double amount) {
+        cardService.transferMoney(cardId1, cardId2, BigDecimal.valueOf(amount));
     }
 
 
@@ -86,7 +85,7 @@ public class ClientController {
         return cardService.getBalance(id);
     }
 
-    @Operation(summary = "Просмотр баланса карты")
+    @Operation(summary = "Запрос на блокировку карты")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),

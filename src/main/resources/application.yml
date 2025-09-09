@@ -34,4 +34,4 @@ springdoc:
     enabled: true
 
 server:
-  port: 8181
+  port: 8081

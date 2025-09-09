@@ -11,7 +11,6 @@ import com.example.bankcards.exception.UserNoSuchException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardMapper;
-import com.example.bankcards.util.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +31,6 @@ public class CardService {
     private final CardRepository cardRepository;
     private final CardMapper cardMapper;
     private final UserRepository userRepository;
-    private final Utils utils;
-
 
     public CardDto create(Long userId) {
         int VALIDITY_PERIOD = 5;
@@ -58,22 +55,9 @@ public class CardService {
         return cardMapper.toCardDto(cardRepository.findById(id).orElseThrow(CardNoSuchException::new));
     }
 
-    public CardDto findByCardNumber(String cardNumber) {
-        return cardMapper.toCardDto(cardRepository.findByCardNumber(utils.transformNumber(cardNumber)).orElseThrow(CardNoSuchException::new));
-    }
-
     public Collection<CardDto> findByOwnerId(long ownerId, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         return cardRepository.findByOwnerId(ownerId, pageRequest).getContent().stream().map(cardMapper::toCardDto).toList();
-    }
-
-    public Collection<CardDto> findByOwnerIdAndCardNumber(long ownerId,
-                                                          String cardNumber,
-                                                          int page,
-                                                          int size) {
-        PageRequest pageRequest = PageRequest.of(page - 1, size);
-        return cardRepository.findByOwnerIdAndCardNumber(ownerId, utils.transformNumber(cardNumber), pageRequest).getContent()
-                .stream().map(cardMapper::toCardDto).toList();
     }
 
     public void delete(UUID id) {
@@ -99,20 +83,17 @@ public class CardService {
     }
 
     @Transactional
-    public void transferMoney(String cardNumber1, String cardNumber2, double amount) {
-        if (amount <= 0) {
+    public void transferMoney(String cardId1, String cardId2, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new MyIllegalArgumentException("Введите сумму больше нуля");
         }
-
-        Card card1 = cardRepository.findByCardNumber(utils.transformNumber(cardNumber1)).orElseThrow(CardNoSuchException::new);
-        Card card2 = cardRepository.findByCardNumber(utils.transformNumber(cardNumber2)).orElseThrow(CardNoSuchException::new);
-
-        if (card1.getBalance().doubleValue() < amount) {
-            throw new MyIllegalArgumentException("Недостаточно средств для перевода");
+        Card card1 = cardRepository.findById(UUID.fromString(cardId1)).orElseThrow(CardNoSuchException::new);
+        Card card2 = cardRepository.findById(UUID.fromString(cardId2)).orElseThrow(CardNoSuchException::new);
+        if (card1.getBalance().compareTo(amount) < 0) {
+            throw new MyIllegalArgumentException("Недостаточно денег");
         }
-
-        card1.setBalance(card1.getBalance().subtract(BigDecimal.valueOf(amount)));
-        card2.setBalance(card2.getBalance().add(BigDecimal.valueOf(amount)));
+        card1.setBalance(card1.getBalance().subtract(amount));
+        card2.setBalance(card2.getBalance().add(amount));
         cardRepository.save(card1);
         cardRepository.save(card2);
     }

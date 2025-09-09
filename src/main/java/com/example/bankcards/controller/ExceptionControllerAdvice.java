@@ -56,5 +56,11 @@ public class ExceptionControllerAdvice {
         BankError bankError = new BankError("400", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bankError);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<BankError> handleIllegalArgumentException(@NotNull IllegalArgumentException e) {
+        BankError bankError = new BankError("400", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bankError);
+    }
 }
 

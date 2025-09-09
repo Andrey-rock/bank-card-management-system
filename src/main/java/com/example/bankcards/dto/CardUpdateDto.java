@@ -4,7 +4,6 @@ import com.example.bankcards.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,10 +29,8 @@ public class CardUpdateDto {
     @NotBlank
     @Schema(description = "номер карты", example = "1111 2222 3333 4444")
     private String cardNumber;
-    @Pattern(regexp = "[0-9]{4}/[0-9]{2}/[0-9]{2}")
     @Schema(description = "Срок действия", format = "date")
     private LocalDate expiryDate;
-    @NotBlank
     @Schema(description = "статус")
     private Status status;
     @Min(0)
