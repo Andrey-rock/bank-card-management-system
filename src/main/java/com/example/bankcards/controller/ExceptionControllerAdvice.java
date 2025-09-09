@@ -1,10 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.BankError;
-import com.example.bankcards.exception.CardNoSuchException;
-import com.example.bankcards.exception.UserAlreadyExistException;
-import com.example.bankcards.exception.UserNoSuchException;
-import com.example.bankcards.exception.WrongPasswordException;
+import com.example.bankcards.exception.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -50,6 +47,18 @@ public class ExceptionControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<BankError> handleHttpMessageNotReadableException(@NotNull HttpMessageNotReadableException e) {
+        BankError bankError = new BankError("400", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bankError);
+    }
+
+    @ExceptionHandler(MyIllegalArgumentException.class)
+    public ResponseEntity<BankError> handleMyIllegalArgumentException(@NotNull MyIllegalArgumentException e) {
+        BankError bankError = new BankError("400", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bankError);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<BankError> handleIllegalArgumentException(@NotNull IllegalArgumentException e) {
         BankError bankError = new BankError("400", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bankError);
     }

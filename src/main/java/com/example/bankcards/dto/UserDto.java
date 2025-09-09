@@ -31,7 +31,6 @@ public class UserDto {
     @NotBlank
     @Schema(description = "имя пользователя", minLength = 4,maxLength = 32)
     private String username;
-    @NotBlank
     @Schema(description = "роль")
     private Role role;
     @Schema(description = "статус пользователя")

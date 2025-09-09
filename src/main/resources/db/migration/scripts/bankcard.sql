@@ -18,6 +18,5 @@ CREATE TABLE cards
     expiration_date DATE        NOT NULL,
     status          VARCHAR(16) NOT NULL,
     balance         NUMERIC check (balance >= 0),
-    request_block   BOOLEAN,
     FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
