@@ -50,6 +50,9 @@ public class CardServiceTest {
     String cardNumber1 = "1234567890123456";
     String cardNumber2 = "9876543210987654";
 
+    UUID uuid1;
+    UUID uuid2;
+
     @BeforeEach
     void setUp() {
 
@@ -66,18 +69,18 @@ public class CardServiceTest {
         card2.setStatus(Status.ACTIVE);
         card2.setExpiryDate(LocalDate.now(Clock.systemDefaultZone()));
         card2.setBalance(BigDecimal.valueOf(1000));
+
+        uuid1 = card1.getCardId();
+        uuid2 = card2.getCardId();
     }
-
-
 
     @Test
     public void transferMoney_ShouldTransferSuccessfully_WhenValidData() {
-        when(utils.transformNumber(cardNumber1)).thenReturn(cardNumber1);
-        when(utils.transformNumber(cardNumber2)).thenReturn(cardNumber2);
-        when(cardRepository.findByCardNumber(cardNumber1)).thenReturn(Optional.of(card1));
-        when(cardRepository.findByCardNumber(cardNumber2)).thenReturn(Optional.of(card2));
 
-        cardService.transferMoney(cardNumber2, cardNumber1, 400.89);
+        when(cardRepository.findById(uuid1)).thenReturn(Optional.of(card1));
+        when(cardRepository.findById(uuid2)).thenReturn(Optional.of(card2));
+
+        cardService.transferMoney(uuid2.toString(), uuid1.toString(), BigDecimal.valueOf(400.89));
 
         Assertions.assertEquals(BigDecimal.valueOf(400.89), card1.getBalance());
         Assertions.assertEquals(BigDecimal.valueOf(599.11), card2.getBalance());
@@ -88,22 +91,21 @@ public class CardServiceTest {
 
     @Test
     public void transferMoney_ShouldThrowCardNoSuchException_WhenFirstCardNotFound() {
-        when(utils.transformNumber(cardNumber1)).thenReturn(cardNumber1);
-        when(cardRepository.findByCardNumber(cardNumber1)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(CardNoSuchException.class, () -> cardService.transferMoney(cardNumber1, cardNumber2, 400));
+        when(cardRepository.findById(uuid1)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(CardNoSuchException.class, () -> cardService.transferMoney(uuid1.toString(), uuid2.toString(), BigDecimal.valueOf(400)));
         verify(cardRepository, never()).save(any(Card.class));
     }
 
     @Test
     void transferMoney_ShouldThrowCardNoSuchException_WhenSecondCardNotFound() {
-        when(utils.transformNumber(cardNumber1)).thenReturn(cardNumber1);
-        when(utils.transformNumber(cardNumber2)).thenReturn(cardNumber2);
-        when(cardRepository.findByCardNumber(cardNumber1)).thenReturn(Optional.of(card1));
-        when(cardRepository.findByCardNumber(cardNumber2)).thenReturn(Optional.empty());
+
+        when(cardRepository.findById(uuid1)).thenReturn(Optional.of(card1));
+        when(cardRepository.findById(uuid2)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(CardNoSuchException.class,
-                () -> cardService.transferMoney(cardNumber1, cardNumber2, 400));
+                () -> cardService.transferMoney(uuid1.toString(), uuid2.toString(), BigDecimal.valueOf(400)));
 
         verify(cardRepository, never()).save(any(Card.class));
     }
@@ -112,7 +114,7 @@ public class CardServiceTest {
     void transferMoney_ShouldThrowMyIllegalArgumentException_WhenAmountIsZero() {
 
         MyIllegalArgumentException e = Assertions.assertThrows(MyIllegalArgumentException.class,
-                () -> cardService.transferMoney(cardNumber1, cardNumber2, 0));
+                () -> cardService.transferMoney(uuid1.toString(), uuid2.toString(), BigDecimal.ZERO));
 
         verify(cardRepository, never()).save(any(Card.class));
         verify(utils, never()).transformNumber(anyString());
@@ -122,15 +124,13 @@ public class CardServiceTest {
 
     @Test
     void transferMoney_ShouldThrowMyIllegalArgumentException_WhenInsufficientFunds() {
-        when(utils.transformNumber(cardNumber1)).thenReturn(cardNumber1);
-        when(utils.transformNumber(cardNumber2)).thenReturn(cardNumber2);
-        when(cardRepository.findByCardNumber(cardNumber1)).thenReturn(Optional.of(card1));
-        when(cardRepository.findByCardNumber(cardNumber2)).thenReturn(Optional.of(card2));
+        when(cardRepository.findById(uuid1)).thenReturn(Optional.of(card1));
+        when(cardRepository.findById(uuid2)).thenReturn(Optional.of(card2));
 
         MyIllegalArgumentException e = Assertions.assertThrows(MyIllegalArgumentException.class,
-                () -> cardService.transferMoney(cardNumber1, cardNumber2, 1400));
+                () -> cardService.transferMoney(uuid1.toString(), uuid2.toString(), BigDecimal.valueOf(1400)));
 
         verify(cardRepository, never()).save(any(Card.class));
-        Assertions.assertEquals("Недостаточно средств для перевода", e.getMessage());
+        Assertions.assertEquals("Недостаточно денег", e.getMessage());
     }
 }
