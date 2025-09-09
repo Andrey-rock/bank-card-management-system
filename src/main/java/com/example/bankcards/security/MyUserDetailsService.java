@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -16,11 +15,9 @@ import org.springframework.stereotype.Service;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-//    private final PasswordEncoder encoder;
 
-    public MyUserDetailsService(UserRepository userRepository, PasswordEncoder encoder) {
+    public MyUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
-//        this.encoder = encoder;
     }
 
     /**
@@ -63,27 +60,4 @@ public class MyUserDetailsService implements UserDetailsService {
 
         userRepository.save(user);
     }
-
-    /**
-     * Метод для обновления пароля пользователя
-     *
-     * @param username    - логин пользователя
-     * @param newPassword - новый пароль
-     * @return boolean
-     */
-//    public boolean changePassword(String username, @NotNull NewPassword newPassword) {
-//
-//        log.debug("Method for change password start");
-//        User user = userRepository.findByOwnerId(username);
-//        String currentPass = newPassword.getCurrentPassword();
-//        String newPass = newPassword.getNewPassword();
-//        if (encoder.matches(currentPass, userEntity.getPassword())) {
-//            userEntity.setPassword(encoder.encode(newPass));
-//            userRepository.save(userEntity);
-//            log.debug("Method for change password successfully completed");
-//            return true;
-//        }
-//        log.debug("Method for change password fail");
-//        return false;
-//    }
 }

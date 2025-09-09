@@ -65,6 +65,7 @@ public class ClientController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @PostMapping("transfer")
+  
     public void transferMany(@RequestParam(name = "cardId1") String cardId1,
                              @RequestParam(name = "cardId2") String cardId2,
                              double amount) {

@@ -43,7 +43,6 @@ public class CardService {
         card.setExpiryDate(LocalDate.now(Clock.systemDefaultZone()).plusYears(VALIDITY_PERIOD));
         card.setBalance(BigDecimal.ZERO);
 
-
         Card savedCard = cardRepository.save(card);
         return cardMapper.toCardDto(savedCard);
     }
