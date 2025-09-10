@@ -17,6 +17,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервис регистрации и аутентификации
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,10 +35,15 @@ public class AuthService {
 
     /**
      * Метод для авторизации пользователя
+     * <p>
+     * Проверяет наличие пользователя в базе и совпадение переданного пароля с сохраненным
+     * и выдает токен, если все верно
      *
      * @param userName - логин пользователя
      * @param password - пароль пользователя
-     * @return проверяет совпадение переданного пароля с сохраненным
+     * @return DTO сгенерированного токена
+     * @throws UserNoSuchException    если пользователя не найден
+     * @throws WrongPasswordException если пароль неверен
      */
 
     public JwtAuthenticationResponse login(String userName, String password) {
@@ -53,9 +64,12 @@ public class AuthService {
 
     /**
      * Метод для регистрации нового пользователя
+     * <p>
+     * Проверяет уникальность имени пользователя и выдает токен, если пользователь ещё не зарегистрирован
      *
      * @param register - DTO для регистрации пользователя
-     * @return boolean
+     * @return DTO сгенерированного токена
+     * @throws UserAlreadyExistException если пользователь уже зарегистрирован
      */
 
     public JwtAuthenticationResponse register(@NotNull Register register) {

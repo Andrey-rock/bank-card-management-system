@@ -4,6 +4,7 @@ import com.example.bankcards.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,13 +25,16 @@ import java.util.UUID;
 @Schema(description = "Информация о карте для изменения данных")
 public class CardUpdateDto {
 
+    @NotNull
     @Schema(description = "идентификатор карты", example = "00000000-0000-0000-0000-000000000000")
     private UUID id;
     @NotBlank
     @Schema(description = "номер карты", example = "1111 2222 3333 4444")
     private String cardNumber;
+    @NotNull
     @Schema(description = "Срок действия", format = "date")
     private LocalDate expiryDate;
+    @NotNull
     @Schema(description = "статус")
     private Status status;
     @Min(0)

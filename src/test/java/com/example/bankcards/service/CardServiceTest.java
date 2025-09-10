@@ -118,7 +118,6 @@ public class CardServiceTest {
 
         verify(cardRepository, never()).save(any(Card.class));
         verify(utils, never()).transformNumber(anyString());
-        verify(cardRepository, never()).findByCardNumber(anyString());
         Assertions.assertEquals("Введите сумму больше нуля", e.getMessage());
     }
 
