@@ -3,6 +3,7 @@ package com.example.bankcards.dto;
 import com.example.bankcards.entity.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class Register {
     @NotBlank
     @Schema(description = "пароль", minLength = 8,maxLength = 16)
     private String password;
+    @NotNull
     @Schema(description = "роль пользователя")
     private Role role;
 }

@@ -1,6 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.CardUpdateDto;
+import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.Status;
@@ -17,7 +18,6 @@ import com.example.bankcards.util.Utils;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -74,24 +74,22 @@ public class AdminControllerTest {
     @SpyBean
     Utils utils;
 
-    @InjectMocks
-    AdminController adminController;
-
     private final UUID testCardId = UUID.randomUUID();
     private final Long testUserId = 1L;
+    private final User user = new User(testUserId, "username", "password", Role.ADMIN, true, List.of(new Card()));
+    private final User user2 = new User(2L, "username2", "password2", Role.USER, true, List.of(new Card()));
+    private final Card card1 = new Card(testCardId, "number1", LocalDate.now(Clock.systemDefaultZone()),
+            Status.ACTIVE, BigDecimal.ZERO, user);
+    private final Card card2 = new Card(UUID.randomUUID(), "0000000000001234", LocalDate.now(Clock.systemDefaultZone()),
+            Status.BLOCKED, BigDecimal.TEN, user);
 
     @Test
     public void getAllCardsTest() throws Exception {
-
-        User user = new User(testUserId, "username", "password", Role.ADMIN, true, List.of(new Card()));
-        Card card1 = new Card(UUID.randomUUID(), "number1", LocalDate.now(Clock.systemDefaultZone()),
-                Status.ACTIVE, BigDecimal.ZERO, user);
-        Card card2 = new Card(UUID.randomUUID(), "0000000000001234", LocalDate.now(Clock.systemDefaultZone()),
-                Status.BLOCKED, BigDecimal.TEN, user);
+        // Given
         List<Card> cards = List.of(card1, card2);
-
         when(cardRepository.findAll()).thenReturn(cards);
 
+        // When & Then
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/admin/cards")//
                         .accept(MediaType.APPLICATION_JSON)
@@ -117,9 +115,7 @@ public class AdminControllerTest {
                 Status.ACTIVE,
                 BigDecimal.valueOf(1500.50)
         );
-        User user = new User(testUserId, "username", "password", Role.ADMIN, true, List.of(new Card()));
-        Card card1 = new Card(testCardId, "1234567890123456", LocalDate.now(),
-                Status.ACTIVE, BigDecimal.ZERO, user);
+
         when(cardRepository.findById(testCardId)).thenReturn(Optional.of(card1));
         when(cardRepository.save(card1)).thenReturn(card1);
 
@@ -131,7 +127,6 @@ public class AdminControllerTest {
         object.put("balance", updateDto.getBalance());
 
         // When & Then
-
         mockMvc.perform(put("/admin")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(String.valueOf(object))
@@ -157,9 +152,7 @@ public class AdminControllerTest {
                 Status.ACTIVE,
                 new BigDecimal("1000.00")
         );
-        User user = new User(testUserId, "username", "password", Role.ADMIN, true, List.of(new Card()));
-        Card card1 = new Card(testCardId, "1234567890123456", LocalDate.now(),
-                Status.ACTIVE, BigDecimal.ZERO, user);
+
         when(cardRepository.findById(testCardId)).thenReturn(Optional.of(card1));
 
         JSONObject object = new JSONObject();
@@ -167,7 +160,6 @@ public class AdminControllerTest {
         object.put("expiryDate", invalidDto.getExpiryDate());
         object.put("status", invalidDto.getStatus());
         object.put("balance", invalidDto.getBalance());
-
 
         // When & Then
         mockMvc.perform(put("/admin")
@@ -261,7 +253,6 @@ public class AdminControllerTest {
         verify(cardService, never()).update(any());
     }
 
-
     @Test
     void updateCard_WithMalformedJson_ShouldReturnBadRequest() throws Exception {
         // Given - некорректный JSON
@@ -277,4 +268,145 @@ public class AdminControllerTest {
         verify(cardService, never()).update(any());
     }
 
+    @Test
+    public void getAllUsersTest() throws Exception {
+        // Given
+        List<User> users = List.of(user, user2);
+        when(userRepository.findAll()).thenReturn(users);
+
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/admin/users")//
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].username").value("username"))
+                .andExpect(jsonPath("$[0].role").value("ADMIN"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].username").value("username2"))
+                .andExpect(jsonPath("$[1].role").value("USER"));
+    }
+
+    @Test
+    void updateUser_WithValidData_ShouldReturnUpdatedUser() throws Exception {
+        // Given
+        UserDto userDto = new UserDto(
+                1L,
+                "username",
+                Role.ADMIN,
+                true
+        );
+
+        when(userRepository.existsById(userDto.getId())).thenReturn(true);
+        when(userRepository.getReferenceById(userDto.getId())).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+
+        JSONObject object = new JSONObject();
+        object.put("id", testUserId);
+        object.put("username", userDto.getUsername());
+        object.put("role", userDto.getRole().toString());
+        object.put("enabled", userDto.isEnabled());
+
+        // When & Then
+        mockMvc.perform(put("/admin/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(object))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.username").value("username"))
+                .andExpect(jsonPath("$.role").value("ADMIN"))
+                .andExpect(jsonPath("$.enabled").value("true"));
+
+        verify(userRepository).getReferenceById(user.getId());
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void updateUser_WithTooShortName_ShouldReturnBadRequest() throws Exception {
+        // Given
+        UserDto userDto = new UserDto(
+                1L,
+                "qwe",
+                Role.ADMIN,
+                true
+        );
+
+        JSONObject object = new JSONObject();
+        object.put("id", testUserId);
+        object.put("username", userDto.getUsername());
+        object.put("role", userDto.getRole().toString());
+        object.put("enabled", userDto.isEnabled());
+
+        // When & Then
+        mockMvc.perform(put("/admin/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(object))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest());
+
+        verify(userRepository, never()).getReferenceById(any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void updateUser_WithInvalidRole_ShouldReturnBadRequest() throws Exception {
+        // Given
+        UserDto userDto = new UserDto(
+                1L,
+                "username",
+                Role.ADMIN,
+                true
+        );
+
+        JSONObject object = new JSONObject();
+        object.put("id", testUserId);
+        object.put("username", userDto.getUsername());
+        object.put("role", "invalidRole");
+        object.put("enabled", userDto.isEnabled());
+
+        // When & Then
+        mockMvc.perform(put("/admin/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(object))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest());
+
+        verify(userRepository, never()).getReferenceById(any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void updateUser_IfUserNotExsist_ShouldReturnNotFound() throws Exception {
+        // Given
+        UserDto userDto = new UserDto(
+                1L,
+                "username",
+                Role.ADMIN,
+                true
+        );
+
+        JSONObject object = new JSONObject();
+        object.put("id", testUserId);
+        object.put("username", userDto.getUsername());
+        object.put("role", userDto.getRole().toString());
+        object.put("enabled", userDto.isEnabled());
+
+        when(userRepository.existsById(userDto.getId())).thenReturn(false);
+
+        // When & Then
+        mockMvc.perform(put("/admin/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(object))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isNotFound());
+
+        verify(userRepository, never()).getReferenceById(any());
+        verify(userRepository, never()).save(any());
+    }
 }

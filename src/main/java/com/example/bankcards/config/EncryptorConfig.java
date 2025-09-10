@@ -9,6 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
+/**
+ * Конфигурация шифратора номеров карт
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

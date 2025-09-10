@@ -145,7 +145,7 @@ public class AdminController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("users")
     public Collection<UserDto> getUsers() {
-       return userService.getAllUsers();
+        return userService.getAllUsers();
     }
 
     @Operation(summary = "Получение пользователя по id")

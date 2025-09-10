@@ -34,6 +34,7 @@ public class UserService {
         User user1 = userRepository.getReferenceById(user.getId());
         user1.setUsername(user.getUsername());
         user1.setRole(user.getRole());
+        user1.setEnabled(user.isEnabled());
         return userMapper.entityToDto(userRepository.save(user1));
     }
 
