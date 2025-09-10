@@ -10,6 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Обёртка модели пользователя для работы с Security
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 public record SecurityUser(User user) implements UserDetails {
 
     @Contract(" -> new")

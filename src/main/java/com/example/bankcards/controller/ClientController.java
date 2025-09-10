@@ -43,9 +43,9 @@ public class ClientController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @GetMapping()
-    public ResponseEntity<?> getAllCardsByName(Authentication authentication,
-                                                 @RequestParam(defaultValue = "1") int page,
-                                                 @RequestParam(defaultValue = "3") int size) {
+    public ResponseEntity<?> getAllCardsByUser(Authentication authentication,
+                                                 @RequestParam(defaultValue = "1", name = "page") int page,
+                                                 @RequestParam(defaultValue = "3", name = "size") int size) {
         Collection<CardDto> response;
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

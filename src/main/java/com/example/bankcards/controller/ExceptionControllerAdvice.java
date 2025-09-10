@@ -11,6 +11,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * Контроллер глобальной обработки исключений
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 @Hidden
 @ControllerAdvice
 public class ExceptionControllerAdvice {

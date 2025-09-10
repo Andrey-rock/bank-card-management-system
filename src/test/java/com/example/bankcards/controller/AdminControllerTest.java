@@ -40,6 +40,12 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+/**
+ * Тестирование AdminController
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 @WebMvcTest(AdminController.class)
 @WithMockUser(roles = "ADMIN")
 public class AdminControllerTest {
@@ -83,8 +89,10 @@ public class AdminControllerTest {
     private final Card card2 = new Card(UUID.randomUUID(), "0000000000001234", LocalDate.now(Clock.systemDefaultZone()),
             Status.BLOCKED, BigDecimal.TEN, user);
 
+    //Тестирование наиболее сложных методов работы с картами
+
     @Test
-    public void getAllCardsTest() throws Exception {
+    void getAllCardsTest() throws Exception {
         // Given
         List<Card> cards = List.of(card1, card2);
         when(cardRepository.findAll()).thenReturn(cards);
@@ -268,8 +276,10 @@ public class AdminControllerTest {
         verify(cardService, never()).update(any());
     }
 
+    //Тестирование наиболее сложных методов управления пользователями
+
     @Test
-    public void getAllUsersTest() throws Exception {
+    void getAllUsersTest() throws Exception {
         // Given
         List<User> users = List.of(user, user2);
         when(userRepository.findAll()).thenReturn(users);

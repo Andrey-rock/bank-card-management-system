@@ -11,6 +11,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Модель банковской карты
+ *
+ * @author Andrei Bronskijj, 2025
+ * @version 0.0.1
+ */
 @Entity
 @Data
 @NoArgsConstructor
