@@ -1,1 +1,533 @@
 # Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.0.1
+servers:
+  - url: 'http://localhost:8081'
+    description: 'Generated server url'
+paths:
+  /admin:
+    put:
+      tags:
+        - 'Функции администратора'
+      summary: 'Смена данных карты'
+      operationId: updateCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardUpdateDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '403':
+          description: Forbidden
+        '400':
+          description: 'Bad request'
+  /admin/user:
+    put:
+      tags:
+        - 'Функции администратора'
+      summary: 'Смена данных пользователя'
+      operationId: updateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '403':
+          description: Forbidden
+        '400':
+          description: 'Bad request'
+  /user/transfer:
+    post:
+      tags:
+        - 'Функции пользователя'
+      summary: 'Перевод денег между картами пользователя'
+      operationId: transferMany
+      parameters:
+        - name: cardId1
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: cardId2
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '400':
+          description: 'Bad request'
+  /user/block/{id}:
+    post:
+      tags:
+        - 'Функции пользователя'
+      summary: 'Запрос на блокировку карты'
+      operationId: blockingRequest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+        '401':
+          description: Unauthorized
+        '404':
+          description: 'Not found'
+  /register:
+    post:
+      tags:
+        - Регистрация
+      summary: 'Регистрация пользователя'
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      responses:
+        '400':
+          description: 'Bad Request'
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationResponse'
+  /login:
+    post:
+      tags:
+        - Аутентификация
+      summary: 'Аутентификация пользователя'
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationResponse'
+        '401':
+          description: Unauthorized
+  /admin/{userId}:
+    post:
+      tags:
+        - 'Функции администратора'
+      summary: 'Создание карты'
+      operationId: createCard
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '403':
+          description: Forbidden
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+  /admin/{id}:
+    get:
+      tags:
+        - 'Функции администратора'
+      summary: 'Получение карты по id'
+      operationId: getCardById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not found'
+    delete:
+      tags:
+        - 'Функции администратора'
+      summary: 'Удаление карты'
+      operationId: deleteCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No content'
+        '404':
+          description: 'Not found'
+        '403':
+          description: Forbidden
+    patch:
+      tags:
+        - 'Функции администратора'
+      summary: 'Смена статуса карты'
+      operationId: setStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '403':
+          description: Forbidden
+        '400':
+          description: 'Bad request'
+  /admin/user/block/{id}:
+    patch:
+      tags:
+        - 'Функции администратора'
+      summary: 'Блокировка пользователя'
+      operationId: blockedUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+  /user:
+    get:
+      tags:
+        - 'Функции пользователя'
+      summary: 'Просмотр всех карт текущего пользователя'
+      operationId: getAllCardsByUser
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 3
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+        '403':
+          description: Forbidden
+        '401':
+          description: Unauthorized
+  /user/{id}/balance:
+    get:
+      tags:
+        - 'Функции пользователя'
+      summary: 'Просмотр баланса карты'
+      operationId: getBalance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: number
+        '403':
+          description: Forbidden
+        '400':
+          description: 'Bad request'
+  /admin/users:
+    get:
+      tags:
+        - 'Функции администратора'
+      summary: 'Просмотр всех пользователей'
+      operationId: getUsers
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+        '403':
+          description: Forbidden
+  /admin/user/{id}:
+    get:
+      tags:
+        - 'Функции администратора'
+      summary: 'Получение пользователя по id'
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not found'
+    delete:
+      tags:
+        - 'Функции администратора'
+      summary: 'Удаление пользователя'
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 'No content'
+        '404':
+          description: 'Not found'
+        '403':
+          description: Forbidden
+  /admin/cards:
+    get:
+      tags:
+        - 'Функции администратора'
+      summary: 'Просмотр всех карт'
+      operationId: getAllCards
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDto'
+        '403':
+          description: Forbidden
+info:
+  title: Bank Card Management System
+  version: 0.0.1
+components:
+  schemas:
+    CardUpdateDto:
+      required:
+        - cardNumber
+        - expiryDate
+        - id
+        - status
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'идентификатор карты'
+          format: uuid
+          example: '00000000-0000-0000-0000-000000000000'
+        cardNumber:
+          type: string
+          description: 'номер карты'
+          example: '1111 2222 3333 4444'
+        expiryDate:
+          type: string
+          description: 'Срок действия'
+          format: date
+        status:
+          type: string
+          description: статус
+          enum:
+            - ACTIVE
+            - BLOCKED
+            - EXPIRED
+        balance:
+          minimum: 0
+          type: number
+          description: 'баланс карты'
+      description: 'Информация о карте для изменения данных'
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'идентификатор карты'
+          format: uuid
+        cardNumber:
+          type: string
+          description: 'номер карты'
+          example: '**** **** **** 1234'
+        expiryDate:
+          type: string
+          description: 'срок действия'
+          format: date
+        status:
+          type: string
+          description: статус
+          enum:
+            - ACTIVE
+            - BLOCKED
+            - EXPIRED
+        balance:
+          type: number
+          description: 'баланс карты'
+        ownerName:
+          type: string
+          description: 'владелец карты'
+      description: 'ответ c информацией о карте'
+    UserDto:
+      required:
+        - id
+        - role
+        - username
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: 'идентификатор пользователя'
+          format: int64
+        username:
+          maxLength: 32
+          minLength: 4
+          type: string
+          description: 'имя пользователя'
+        role:
+          type: string
+          description: роль
+          enum:
+            - ADMIN
+            - USER
+        enabled:
+          type: boolean
+          description: 'статус пользователя'
+      description: 'информация о пользователе'
+    Register:
+      required:
+        - password
+        - role
+        - username
+      type: object
+      properties:
+        username:
+          maxLength: 32
+          minLength: 4
+          type: string
+          description: логин
+        password:
+          maxLength: 16
+          minLength: 8
+          type: string
+          description: пароль
+        role:
+          type: string
+          description: 'роль пользователя'
+          enum:
+            - ADMIN
+            - USER
+      description: 'Форма регистрации'
+    JwtAuthenticationResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: 'Токен доступа'
+          example: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYyMjUwNj...'
+      description: 'Ответ c токеном доступа'
+    Login:
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          maxLength: 32
+          minLength: 4
+          type: string
+          description: логин
+        password:
+          maxLength: 16
+          minLength: 8
+          type: string
+          description: пароль
+      description: 'Форма аутентификации'

@@ -51,7 +51,7 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content())
     })
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
     public JwtAuthenticationResponse register(@Valid @RequestBody Register register) {
 
