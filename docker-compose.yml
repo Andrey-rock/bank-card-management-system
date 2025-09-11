@@ -1,0 +1,37 @@
+# 
+# docker-compose.yml — определяет сервисы для разработки и тестирования.
+
+version: '3.8'
+services:
+  bank-app:
+    image: 'bank:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bank-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - bank-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://bank-db/bank
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+
+  bank-db:
+    image: 'postgres:17.1-alpine'
+    container_name: bank-db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=bank
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/main/resources/db/migration/scripts/create.sql:/docker-entrypoint-initdb.d/create.sql
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+
