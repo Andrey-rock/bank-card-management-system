@@ -118,5 +118,3 @@ mvn spring-boot:run
 ```bash
 mvn test
 ```
-
-Все тесты будут выполнены с использованием JUnit и Spring Boot тестирования.
